@@ -9,36 +9,44 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { auth } from "../firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Aviso", "Por favor ingresa tu correo y contraseña.");
+  const handleRegister = async () => {
+    if (!email || !password || !name) {
+      Alert.alert("Aviso", "Por favor completa todos los campos.");
       return;
     }
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password,
       );
-      console.log("¡Inicio de sesión exitoso!", userCredential.user.email);
-      Alert.alert("¡Éxito!", "Has iniciado sesión correctamente.");
-      // router.push('/eventos'); // Aquí redirigiremos a la pantalla de eventos más adelante
+      console.log("¡Usuario registrado con éxito!", userCredential.user.email);
+      Alert.alert("¡Bienvenido!", "Tu cuenta ha sido creada con éxito.");
+      router.replace("/"); // Te regresa a la pantalla de Login automáticamente
     } catch (error: any) {
-      console.error("Error al iniciar sesión:", error.message);
-      Alert.alert("Error", "Credenciales incorrectas o el usuario no existe.");
+      console.error("Error al registrar:", error.message);
+      Alert.alert("Error al registrar", error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Eventos Comunitarios</Text>
+      <Text style={styles.title}>Crear Cuenta</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre Completo"
+        value={name}
+        onChangeText={setName}
+      />
 
       <TextInput
         style={styles.input}
@@ -57,12 +65,14 @@ export default function LoginScreen() {
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Registrarse</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.linkText}>¿No tienes cuenta? Regístrate aquí</Text>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Text style={styles.linkText}>
+          ¿Ya tienes cuenta? Inicia sesión aquí
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -89,7 +99,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#28A745",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
