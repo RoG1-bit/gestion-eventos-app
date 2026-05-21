@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth"; // Añade esta línea para la autentica
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // (Tus llaves reales estarán aquí)
+  apiKey: "AIzaSyCot0Ph2Q7KCnkg_kfHtmPPwsdk6NNt0Qo", // (Tus llaves reales estarán aquí)
   authDomain: "gestion-eventos-58c66.firebaseapp.com",
   projectId: "gestion-eventos-58c66",
   storageBucket: "gestion-eventos-58c66.firebasestorage.app",
