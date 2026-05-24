@@ -89,7 +89,7 @@ export default function EventosScreen() {
       <TouchableOpacity
         style={[styles.tarjeta, pasado && styles.tarjetaPasada]}
         onPress={() =>
-          router.push({ pathname: "/evento-detalle", params: { id: item.id } })
+          router.push({ pathname: "/(tabs)/evento-detalle", params: { id: item.id } })
         }
         activeOpacity={0.8}
       >
