@@ -1,99 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, FlatList, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useTheme } from '@/hooks/use-theme';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { db } from '../firebaseConfig';
+
+type Evento = {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  fecha: string;
+  lugar: string;
+};
 
 export default function EventosScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
-  const theme = useTheme();
-  const [eventos, setEventos] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [eventos, setEventos] = useState<Evento[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [refrescando, setRefrescando] = useState(false);
 
-  useEffect(() => {
-    const cargarEventos = async () => {
-      try {
-        // Aquí irá la lógica para cargar eventos de Firebase
-        setEventos([]);
-      } catch (error) {
-        console.error('Error al cargar eventos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    cargarEventos();
+  const cargarEventos = useCallback(async () => {
+    try {
+      const q = query(collection(db, 'eventos'), orderBy('fecha', 'asc'));
+      const snap = await getDocs(q);
+      const lista: Evento[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Evento[];
+      setEventos(lista);
+    } catch (error) {
+      console.error('Error cargando eventos:', error);
+    }
   }, []);
 
-  const renderEvento = ({ item }: any) => (
-    <ThemedView style={styles.eventoCard}>
-      <ThemedText type="subtitle">{item.titulo || 'Evento'}</ThemedText>
-      <ThemedText themeColor="textSecondary">{item.descripcion}</ThemedText>
-    </ThemedView>
-  );
+  useEffect(() => {
+    const inicializar = async () => {
+      setCargando(true);
+      await cargarEventos();
+      setCargando(false);
+    };
+    inicializar();
+  }, [cargarEventos]);
+
+  const onRefrescar = async () => {
+    setRefrescando(true);
+    await cargarEventos();
+    setRefrescando(false);
+  };
+
+  const esPasado = (fechaStr: string) => new Date(fechaStr) < new Date();
+
+  const renderItem = ({ item }: { item: Evento }) => {
+    const pasado = esPasado(item.fecha);
+    return (
+      <TouchableOpacity
+        style={[styles.tarjeta, pasado && styles.tarjetaPasada]}
+        onPress={() =>
+          router.push({ pathname: '/evento-detalle', params: { id: item.id } })
+        }
+        activeOpacity={0.8}
+      >
+        <View style={styles.tarjetaEncabezado}>
+          <Text style={styles.tarjetaTitulo} numberOfLines={2}>
+            {item.titulo}
+          </Text>
+          {pasado ? (
+            <View style={styles.badgePasado}>
+              <Text style={styles.badgeTexto}>Finalizado</Text>
+            </View>
+          ) : (
+            <View style={styles.badgeProximo}>
+              <Text style={styles.badgeTexto}>Próximo</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.tarjetaMeta}>
+          📅{' '}
+          {new Date(item.fecha).toLocaleDateString('es-ES', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
+        </Text>
+        <Text style={styles.tarjetaMeta}>📍 {item.lugar}</Text>
+
+        {item.descripcion ? (
+          <Text style={styles.tarjetaDescripcion} numberOfLines={2}>
+            {item.descripcion}
+          </Text>
+        ) : null}
+
+        <Text style={styles.verDetalle}>Ver detalles →</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  if (cargando) {
+    return (
+      <View style={styles.centrado}>
+        <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.cargandoTexto}>Cargando eventos...</Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={styles.contentContainer}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Eventos</ThemedText>
-          {eventos.length === 0 && !loading && (
-            <ThemedText style={styles.centerText} themeColor="textSecondary">
-              No hay eventos disponibles
-            </ThemedText>
-          )}
-        </ThemedView>
-
-        {eventos.length > 0 && (
-          <FlatList
-            data={eventos}
-            renderItem={renderEvento}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={styles.listContainer}
+    <View style={styles.contenedor}>
+      <Text style={styles.encabezado}>Eventos Comunitarios</Text>
+      <FlatList
+        data={eventos}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.lista}
+        refreshControl={
+          <RefreshControl
+            refreshing={refrescando}
+            onRefresh={onRefrescar}
+            tintColor="#007BFF"
           />
-        )}
-      </ThemedView>
-    </ScrollView>
+        }
+        ListEmptyComponent={
+          <View style={styles.centrado}>
+            <Text style={styles.sinEventos}>No hay eventos disponibles.</Text>
+          </View>
+        }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  container: {
-    maxWidth: MaxContentWidth,
-    flexGrow: 1,
-    width: '100%',
-  },
-  titleContainer: {
-    gap: Spacing.three,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
-  },
-  centerText: {
+  contenedor: { flex: 1, backgroundColor: '#1E1E1E' },
+  encabezado: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFF',
     textAlign: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
   },
-  listContainer: {
-    paddingHorizontal: Spacing.four,
+  lista: { paddingHorizontal: 16, paddingBottom: 32 },
+  centrado: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  cargandoTexto: { color: '#FFF', marginTop: 12, fontSize: 16 },
+  sinEventos: { color: '#888', fontSize: 16, textAlign: 'center' },
+  tarjeta: {
+    backgroundColor: '#2A2A2A',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#333',
   },
-  eventoCard: {
-    marginBottom: Spacing.three,
-    padding: Spacing.three,
-    borderRadius: Spacing.two,
+  tarjetaPasada: { borderColor: '#444', opacity: 0.8 },
+  tarjetaEncabezado: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
+  tarjetaTitulo: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#FFF',
+    flex: 1,
+    marginRight: 8,
+  },
+  tarjetaMeta: { fontSize: 13, color: '#B0B4BA', marginBottom: 3 },
+  tarjetaDescripcion: { fontSize: 13, color: '#999', marginTop: 6 },
+  verDetalle: { color: '#4DA8DA', fontSize: 13, marginTop: 10, fontWeight: '600' },
+  badgePasado: {
+    backgroundColor: '#555',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  badgeProximo: {
+    backgroundColor: '#28A745',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  badgeTexto: { color: '#FFF', fontSize: 11, fontWeight: 'bold' },
 });
+
