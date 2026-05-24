@@ -21,13 +21,15 @@ export default function AppTabs() {
       <TabList asChild>
         <CustomTabList>
           
-          {/* Apunta a explore para que no choque con tu pestaña de eventos */}
-          <TabTrigger name="explore" href="/explore" asChild>
+          <TabTrigger name="index" href="/(tabs)" asChild>
             <TabButton>Home</TabButton>
           </TabTrigger>
 
-          {/* Tu pestaña única de eventos */}
-          <TabTrigger name="eventos" href="/eventos" asChild>
+          <TabTrigger name="explore" href="/(tabs)/explore" asChild>
+            <TabButton>Explore</TabButton>
+          </TabTrigger>
+
+          <TabTrigger name="eventos" href="/(tabs)/eventos" asChild>
             <TabButton>Eventos</TabButton>
           </TabTrigger>
           

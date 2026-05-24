@@ -41,7 +41,7 @@ export default function LoginScreen() {
 
       // 2. Si todo sale bien, muestra éxito y te deja pasar a la app (hacia las pestañas)
       Alert.alert("¡Éxito!", "Has iniciado sesión correctamente.");
-      router.replace("/explore"); // <-- ¡AQUÍ ESTÁ LA CORRECCIÓN!
+      router.replace("/(tabs)"); // <-- ¡AQUÍ ESTÁ LA CORRECCIÓN!
     } catch (error: any) {
       // 3. Si te equivocas de clave o no existes, te bloquea y arroja error
       console.error("Error al iniciar sesión:", error.message);
@@ -56,7 +56,7 @@ export default function LoginScreen() {
       console.log("¡Login con Google exitoso!", result.user.displayName);
 
       Alert.alert("¡Éxito!", `Bienvenido ${result.user.displayName}`);
-      router.replace("/explore"); // <-- ¡Y AQUÍ TAMBIÉN!
+      router.replace("/(tabs)"); // <-- ¡Y AQUÍ TAMBIÉN!
     } catch (error: any) {
       console.error("Error con Google:", error.message);
       Alert.alert("Error", "No se pudo iniciar sesión con Google.");
