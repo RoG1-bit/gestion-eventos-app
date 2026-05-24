@@ -1,10 +1,10 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useTheme } from '@/hooks/use-theme';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import React from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -18,7 +18,8 @@ export default function HomeScreen() {
     <ScrollView
       style={[styles.scrollView, { backgroundColor: theme.background }]}
       contentInset={insets}
-      contentContainerStyle={styles.contentContainer}>
+      contentContainerStyle={styles.contentContainer}
+    >
       <ThemedView style={styles.container}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Bienvenido</ThemedText>
@@ -36,8 +37,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   container: {
     maxWidth: MaxContentWidth,
@@ -45,11 +46,11 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     gap: Spacing.three,
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.six,
   },
   centerText: {
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

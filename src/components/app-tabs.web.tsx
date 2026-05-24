@@ -5,22 +5,21 @@ import {
   TabSlot,
   TabTrigger,
   TabTriggerSlotProps,
-} from 'expo-router/ui';
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+} from "expo-router/ui";
+import React from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import { ThemedText } from "./themed-text";
+import { ThemedView } from "./themed-view";
 
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from "@/constants/theme";
 
 export default function AppTabs() {
   return (
     <Tabs>
-      <TabSlot style={{ height: '100%' }} />
+      <TabSlot style={{ height: "100%" }} />
       <TabList asChild>
         <CustomTabList>
-          
           <TabTrigger name="index" href="/(tabs)" asChild>
             <TabButton>Home</TabButton>
           </TabTrigger>
@@ -32,20 +31,27 @@ export default function AppTabs() {
           <TabTrigger name="eventos" href="/(tabs)/eventos" asChild>
             <TabButton>Eventos</TabButton>
           </TabTrigger>
-          
         </CustomTabList>
       </TabList>
     </Tabs>
   );
 }
 
-export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+export function TabButton({
+  children,
+  isFocused,
+  ...props
+}: TabTriggerSlotProps) {
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
       <ThemedView
-        type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
-        style={styles.tabButtonView}>
-        <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
+        type={isFocused ? "backgroundSelected" : "backgroundElement"}
+        style={styles.tabButtonView}
+      >
+        <ThemedText
+          type="small"
+          themeColor={isFocused ? "text" : "textSecondary"}
+        >
           {children}
         </ThemedText>
       </ThemedView>
@@ -62,7 +68,6 @@ export function CustomTabList(props: TabListProps) {
         </ThemedText>
 
         {props.children}
-
       </ThemedView>
     </View>
   );
@@ -70,27 +75,27 @@ export function CustomTabList(props: TabListProps) {
 
 const styles = StyleSheet.create({
   tabListContainer: {
-    position: 'absolute',
-    width: '100%',
+    position: "absolute",
+    width: "100%",
     padding: Spacing.three,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
   innerContainer: {
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.five,
     borderRadius: Spacing.five,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flexGrow: 1,
     gap: Spacing.two,
     maxWidth: MaxContentWidth,
   },
   brandText: {
-    marginRight: 'auto',
-    color: '#fff',
-    fontWeight: 'bold'
+    marginRight: "auto",
+    color: "#fff",
+    fontWeight: "bold",
   },
   pressed: {
     opacity: 0.7,
