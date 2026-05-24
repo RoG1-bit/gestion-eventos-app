@@ -37,9 +37,31 @@ export default function EventosScreen() {
         ...d.data(),
       })) as Evento[];
       console.log('Lista procesada:', lista);
-      setEventos(lista);
+
+      if (lista.length === 0) {
+        console.warn('⚠️ No hay eventos en Firebase. Usando datos de demostración.');
+        const eventosPrueba: Evento[] = [
+          {
+            id: '1',
+            titulo: 'Concierto Comunitario',
+            fecha: '2026-06-15',
+            lugar: 'Parque Central',
+            descripcion: 'Música en vivo para toda la familia'
+          },
+          {
+            id: '2',
+            titulo: 'Feria de Emprendedores',
+            fecha: '2026-06-20',
+            lugar: 'Plaza Municipal',
+            descripcion: 'Apoya al comercio local'
+          }
+        ];
+        setEventos(eventosPrueba);
+      } else {
+        setEventos(lista);
+      }
     } catch (error) {
-      console.error("Error cargando eventos:", error);
+      console.error("❌ Error cargando eventos:", error);
       setEventos([]);
     }
   }, []);
