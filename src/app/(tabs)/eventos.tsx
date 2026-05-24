@@ -28,15 +28,19 @@ export default function EventosScreen() {
 
   const cargarEventos = useCallback(async () => {
     try {
+      console.log('Iniciando carga de eventos...');
       const q = query(collection(db, "eventos"), orderBy("fecha", "asc"));
       const snap = await getDocs(q);
+      console.log('Eventos obtenidos:', snap.docs.length);
       const lista: Evento[] = snap.docs.map((d) => ({
         id: d.id,
         ...d.data(),
       })) as Evento[];
+      console.log('Lista procesada:', lista);
       setEventos(lista);
     } catch (error) {
       console.error("Error cargando eventos:", error);
+      setEventos([]);
     }
   }, []);
 
