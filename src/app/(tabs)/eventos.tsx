@@ -164,12 +164,23 @@ export default function EventosScreen() {
     ]);
   };
 
-  const handleAbrirDetalle = (evento: Evento) => {
+  const goToList = () => {
+    setVista("lista");
+    setEventoSeleccionado(null);
+    limpiarFormulario();
+  };
+
+  const goToCreate = () => {
+    limpiarFormulario();
+    setVista("crear");
+  };
+
+  const goToDetail = (evento: Evento) => {
     setEventoSeleccionado(evento);
     setVista("detalle");
   };
 
-  const handleAbrirEditar = () => {
+  const goToEdit = () => {
     if (!eventoSeleccionado) return;
     setTitulo(eventoSeleccionado.titulo);
     setDescripcion(eventoSeleccionado.descripcion);
@@ -198,10 +209,7 @@ export default function EventosScreen() {
             <Text style={styles.titulo}>Eventos Comunitarios</Text>
             <TouchableOpacity
               style={styles.btnCrear}
-              onPress={() => {
-                limpiarFormulario();
-                setVista("crear");
-              }}
+              onPress={goToCreate}
             >
               <Text style={styles.btnTexto}>+ Crear</Text>
             </TouchableOpacity>
@@ -217,7 +225,7 @@ export default function EventosScreen() {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.tarjeta}
-                  onPress={() => handleAbrirDetalle(item)}
+                  onPress={() => goToDetail(item)}
                 >
                   <Text style={styles.eventoTitulo}>{item.titulo}</Text>
                   <Text style={styles.eventoMeta}>📅 {item.fecha}</Text>
@@ -246,11 +254,7 @@ export default function EventosScreen() {
         >
           <TouchableOpacity
             style={styles.btnVolver}
-            onPress={() => {
-              setVista("lista");
-              setEventoSeleccionado(null);
-              limpiarFormulario();
-            }}
+            onPress={goToList}
           >
             <Text style={styles.btnVolverTexto}>← Volver</Text>
           </TouchableOpacity>
@@ -277,7 +281,7 @@ export default function EventosScreen() {
             <View style={styles.accionesRow}>
               <TouchableOpacity
                 style={[styles.boton, styles.botonEditar]}
-                onPress={handleAbrirEditar}
+                onPress={goToEdit}
               >
                 <Text style={styles.botonTexto}>✏️ Editar</Text>
               </TouchableOpacity>
@@ -302,11 +306,7 @@ export default function EventosScreen() {
         >
           <TouchableOpacity
             style={styles.btnVolver}
-            onPress={() => {
-              setVista("lista");
-              setEventoSeleccionado(null);
-              limpiarFormulario();
-            }}
+            onPress={goToList}
           >
             <Text style={styles.btnVolverTexto}>← Volver</Text>
           </TouchableOpacity>
