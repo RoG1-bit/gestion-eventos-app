@@ -62,7 +62,9 @@ export default function EventosListaScreen() {
 
   const eliminarEvento = async (id: string) => {
     if (typeof window !== "undefined") {
-      const confirm = window.confirm("¿Eliminar este evento de forma permanente?");
+      const confirm = window.confirm(
+        "¿Eliminar este evento de forma permanente?",
+      );
       if (confirm) {
         try {
           await deleteDoc(doc(db, "eventos", id));
