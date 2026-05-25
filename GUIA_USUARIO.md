@@ -12,7 +12,3 @@ Bienvenido a la aplicación de Gestión de Eventos. Aquí está los pasos para u
 ## 3. Confirmar Asistencia y Comentar
 - Selecciona cualquier evento para ver sus detalles.
 - Utiliza el botón de **RSVP** para confirmar tu asistencia. En la misma pantalla podrás interactuar dejando comentarios.
-
-## 4. Historial y Estadísticas
-- En la pestaña **Historial**, encontrarás un registro de todos los eventos pasados a los que asististe.
-- En la pestaña **Estadísticas**, podrás ver tus métricas de participación mensual en las gráficas interactivas.
