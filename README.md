@@ -29,7 +29,7 @@ Sigue estos pasos para correr el proyecto localmente en tu computadora:
 1. **Clonar el repositorio:**
    ```bash
    git clone [https://github.com/RoG1-bit/Eventos_APP.git]
-   cd gestion-eventos-app
+   cd Eventos_APP
 2. **Instalar las dependencias:**
    npm install
 3.  **Ejecutar la aplicacion:**
