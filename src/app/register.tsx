@@ -1,32 +1,32 @@
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, } from "react-native";
+import { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { auth } from "../firebaseConfig";
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
-    if (!email || !password || !name) {
+    if (!email || !password) {
       Alert.alert("Aviso", "Por favor completa todos los campos.");
       return;
     }
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      console.log("¡Usuario registrado con éxito!", userCredential.user.email);
-      Alert.alert("¡Bienvenido!", "Tu cuenta ha sido creada con éxito.");
-      router.replace("/"); // Te regresa a la pantalla de Login automáticamente
+      await createUserWithEmailAndPassword(auth, email, password);
+      Alert.alert("¡Éxito!", "Cuenta creada de forma correcta.");
+      router.replace("/eventos-lista" as any);
     } catch (error: any) {
-      console.error("Error al registrar:", error.message);
-      Alert.alert("Error al registrar", error.message);
+      Alert.alert("Error", "No se pudo crear la cuenta o el correo ya existe.");
     }
   };
 
@@ -36,14 +36,8 @@ export default function RegisterScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Nombre Completo"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <TextInput
-        style={styles.input}
         placeholder="Correo Electrónico"
+        placeholderTextColor="#888"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -53,6 +47,7 @@ export default function RegisterScreen() {
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
+        placeholderTextColor="#888"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -63,9 +58,7 @@ export default function RegisterScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.linkText}>
-          ¿Ya tienes cuenta? Inicia sesión aquí
-        </Text>
+        <Text style={styles.linkText}>← Volver al Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -76,27 +69,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#1E1E1E",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 30,
+    color: "#FFFFFF",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#555",
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
+    color: "#FFF",
+    backgroundColor: "#2A2A2A",
   },
   button: {
     backgroundColor: "#28A745",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  linkText: { marginTop: 20, color: "#007BFF", textAlign: "center" },
+  linkText: { marginTop: 10, color: "#4DA8DA", textAlign: "center" },
 });

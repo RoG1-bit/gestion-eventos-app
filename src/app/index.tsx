@@ -1,11 +1,13 @@
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import {
   GoogleAuthProvider,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   StyleSheet,
   Text,
@@ -16,90 +18,107 @@ import {
 import { auth } from "../firebaseConfig";
 
 export default function LoginScreen() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Empezamos en false para que se muestre el login
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // Proveedor de Google
-  const googleProvider = new GoogleAuthProvider();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Envolvemos en un setTimeout pequeño para asegurar que el Layout esté montado
+        setTimeout(() => {
+          router.replace("/eventos-lista");
+        }, 100);
+      } else {
+        setCheckingAuth(false);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
-  // Función REAL para Login con Correo y Firebase
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Aviso", "Por favor ingresa tu correo y contraseña.");
+      Alert.alert("Error", "Por favor ingresa correo y contraseña.");
       return;
     }
-
+    setLoading(true);
     try {
-      // 1. Va a Firebase a revisar que el usuario exista
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      console.log("¡Inicio de sesión exitoso!", userCredential.user.email);
-
-      // 2. Si todo sale bien, muestra éxito y te deja pasar a la app (hacia las pestañas)
-      Alert.alert("¡Éxito!", "Has iniciado sesión correctamente.");
-      router.replace("/(tabs)"); // <-- ¡AQUÍ ESTÁ LA CORRECCIÓN!
-    } catch (error: any) {
-      // 3. Si te equivocas de clave o no existes, te bloquea y arroja error
-      console.error("Error al iniciar sesión:", error.message);
-      Alert.alert("Error", "Credenciales incorrectas o el usuario no existe.");
+      await signInWithEmailAndPassword(auth, email, password);
+      setTimeout(() => {
+        router.replace("/eventos-lista");
+      }, 100);
+    } catch (error) {
+      Alert.alert("Error", "Correo o contraseña incorrectos.");
+      setLoading(false);
     }
   };
 
-  // Función REAL para Login con Google y Firebase
+  // Función Login con Google (Solo funciona en modo Web)
   const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("¡Login con Google exitoso!", result.user.displayName);
-
-      Alert.alert("¡Éxito!", `Bienvenido ${result.user.displayName}`);
-      router.replace("/(tabs)"); // <-- ¡Y AQUÍ TAMBIÉN!
+      await signInWithPopup(auth, provider);
     } catch (error: any) {
-      console.error("Error con Google:", error.message);
-      Alert.alert("Error", "No se pudo iniciar sesión con Google.");
+      Alert.alert("Error", "Google Login: " + error.message);
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Eventos Comunitarios</Text>
+      <Text style={styles.title}>Gestión de Eventos</Text>
+      <Text style={styles.subtitle}>Inicia sesión para empezar</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Correo Electrónico"
-        placeholderTextColor="#888"
+        placeholder="Correo electrónico"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
-        placeholderTextColor="#888"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Ingresar</Text>
+        )}
       </TouchableOpacity>
 
-      {/* BOTÓN DE GOOGLE */}
       <TouchableOpacity
-        style={[styles.button, styles.googleButton]}
+        style={[styles.button, { backgroundColor: "#DB4437", marginTop: 10 }]}
         onPress={handleGoogleLogin}
       >
-        <Text style={styles.googleButtonText}>Iniciar Sesión con Google</Text>
+        <Text style={styles.buttonText}>Login con Google</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.linkText}>¿No tienes cuenta? Regístrate aquí</Text>
+      <TouchableOpacity
+        onPress={() => router.push("/register")}
+        style={styles.registerLink}
+      >
+        <Text style={styles.registerText}>
+          ¿No tienes cuenta? Regístrate aquí
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -109,34 +128,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#1E1E1E",
+    padding: 25,
+    backgroundColor: "#f4f6f8",
   },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
+    marginBottom: 10,
     textAlign: "center",
-    marginBottom: 30,
-    color: "#FFFFFF",
+    color: "#333",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 35,
+    textAlign: "center",
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#555",
+    backgroundColor: "#fff",
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 15,
-    color: "#FFF",
-    backgroundColor: "#2A2A2A",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    fontSize: 16,
   },
   button: {
     backgroundColor: "#007BFF",
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
-    marginBottom: 10,
+    marginTop: 10,
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  googleButton: { backgroundColor: "#DB4437" },
-  googleButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  linkText: { marginTop: 10, color: "#4DA8DA", textAlign: "center" },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 18 },
+  registerLink: { marginTop: 25, alignItems: "center" },
+  registerText: { color: "#007BFF", fontSize: 15 },
 });
