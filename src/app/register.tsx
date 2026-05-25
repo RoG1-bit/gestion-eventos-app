@@ -29,7 +29,11 @@ export default function RegisterScreen() {
     }
     try {
       // 1. Crear usuario en Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
 
       // 2. Guardar datos en la base de datos Firestore
@@ -48,9 +52,14 @@ export default function RegisterScreen() {
       router.replace("/eventos-lista" as any);
     } catch (error: any) {
       if (typeof window !== "undefined") {
-        window.alert("Error: No se pudo crear la cuenta o el correo ya existe.");
+        window.alert(
+          "Error: No se pudo crear la cuenta o el correo ya existe.",
+        );
       } else {
-        Alert.alert("Error", "No se pudo crear la cuenta o el correo ya existe.");
+        Alert.alert(
+          "Error",
+          "No se pudo crear la cuenta o el correo ya existe.",
+        );
       }
     }
   };
