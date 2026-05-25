@@ -1,21 +1,21 @@
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import {
-    collection,
-    deleteDoc,
-    doc,
-    onSnapshot,
-    query,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { auth, db } from "../firebaseConfig";
 
@@ -91,7 +91,7 @@ export default function EventosListaScreen() {
         <Text style={styles.title}>Mis Eventos</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity
-            onPress={() => router.push("/explore")}
+            onPress={() => router.push("/estadisticas")}
             style={[
               styles.logoutButton,
               { backgroundColor: "#17a2b8", marginRight: 10 },
@@ -125,7 +125,7 @@ export default function EventosListaScreen() {
                 style={[styles.btn, styles.btnView]}
                 onPress={() =>
                   router.push({
-                    pathname: "/eventos/[id]",
+                    pathname: "/eventos-detalle",
                     params: { id: item.id },
                   })
                 }
@@ -136,7 +136,7 @@ export default function EventosListaScreen() {
                 style={[styles.btn, styles.btnEdit]}
                 onPress={() =>
                   router.push({
-                    pathname: "/eventos",
+                    pathname: "/eventos/FormularioEvento",
                     params: { id: item.id },
                   })
                 }
