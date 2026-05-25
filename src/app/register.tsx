@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
   Alert,
@@ -9,30 +10,63 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
-    if (!email || !password) {
-      Alert.alert("Aviso", "Por favor completa todos los campos.");
+    if (!nombre || !email || !password) {
+      if (typeof window !== "undefined") {
+        window.alert("Por favor completa todos los campos.");
+      } else {
+        Alert.alert("Aviso", "Por favor completa todos los campos.");
+      }
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert("¡Éxito!", "Cuenta creada de forma correcta.");
+      // 1. Crear usuario en Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. Guardar datos en la base de datos Firestore
+      await setDoc(doc(db, "usuarios", user.uid), {
+        uid: user.uid,
+        nombre: nombre,
+        email: email,
+        fechaRegistro: new Date().toISOString(),
+      });
+
+      if (typeof window !== "undefined") {
+        window.alert("¡Éxito! Cuenta creada de forma correcta.");
+      } else {
+        Alert.alert("¡Éxito!", "Cuenta creada de forma correcta.");
+      }
       router.replace("/eventos-lista" as any);
     } catch (error: any) {
-      Alert.alert("Error", "No se pudo crear la cuenta o el correo ya existe.");
+      if (typeof window !== "undefined") {
+        window.alert("Error: No se pudo crear la cuenta o el correo ya existe.");
+      } else {
+        Alert.alert("Error", "No se pudo crear la cuenta o el correo ya existe.");
+      }
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Crear Cuenta</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre Completo"
+        placeholderTextColor="#888"
+        value={nombre}
+        onChangeText={setNombre}
+        autoCapitalize="words"
+      />
 
       <TextInput
         style={styles.input}
