@@ -45,6 +45,21 @@ export default function TabsLayout() {
           tabBarLabel: "Eventos",
         }}
       />
+      {/* ... tus otras pestañas arriba ... */}
+      <Tabs.Screen
+        name="historial"
+        options={{
+          title: "Historial",
+          tabBarLabel: "Historial",
+        }}
+      />
+      <Tabs.Screen
+        name="estadisticas"
+        options={{
+          title: "Estadísticas",
+          tabBarLabel: "Estadísticas",
+        }}
+      />
     </Tabs>
   );
 }
