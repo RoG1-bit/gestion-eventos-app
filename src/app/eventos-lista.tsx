@@ -60,7 +60,19 @@ export default function EventosListaScreen() {
     router.replace("/");
   };
 
-  const eliminarEvento = (id: string) => {
+  const eliminarEvento = async (id: string) => {
+    if (typeof window !== "undefined") {
+      const confirm = window.confirm("¿Eliminar este evento de forma permanente?");
+      if (confirm) {
+        try {
+          await deleteDoc(doc(db, "eventos", id));
+        } catch (error) {
+          window.alert("No se pudo eliminar el evento.");
+        }
+      }
+      return;
+    }
+
     Alert.alert("Confirmar", "¿Eliminar este evento de forma permanente?", [
       { text: "Cancelar", style: "cancel" },
       {
